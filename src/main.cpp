@@ -1,28 +1,30 @@
 #include <cstdio>
+#include <optional>
 
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libavutil/avutil.h>
-#include <libswscale/swscale.h>
-}
+#include "cli/CliParser.h"
+#include "core/AppConfig.h"
+#include "core/AppError.h"
 
-namespace {
-
-void printVersion(const char* name, unsigned version) {
-    std::printf("%-12s %u.%u.%u\n", name,
-                AV_VERSION_MAJOR(version),
-                AV_VERSION_MINOR(version),
-                AV_VERSION_MICRO(version));
-}
-
-}
-
-int main() {
-    std::printf("video-sprite-sheet\n");
-    printVersion("libavformat", avformat_version());
-    printVersion("libavcodec", avcodec_version());
-    printVersion("libavutil", avutil_version());
-    printVersion("libswscale", swscale_version());
-    return 0;
+int main(int argc, char** argv) {
+    try {
+        std::optional<vss::AppConfig> config = vss::CliParser::parse(argc, argv);
+        if (!config.has_value()) {
+            return static_cast<int>(vss::ExitCode::Success);
+        }
+        std::printf("input:    %s\n", config->inputPath.string().c_str());
+        std::printf("grid:     %dx%d, cell width %d px\n", config->cols, config->rows,
+                    config->cellWidth);
+        if (config->intervalSec.has_value()) {
+            std::printf("interval: %g s\n", *config->intervalSec);
+        } else {
+            std::printf("interval: auto\n");
+        }
+        std::printf("image:    %s\n", config->imagePath.string().c_str());
+        std::printf("vtt:      %s\n", config->vttPath.string().c_str());
+        std::printf("quality:  %d\n", config->jpegQuality);
+        return static_cast<int>(vss::ExitCode::Success);
+    } catch (const vss::AppError& e) {
+        std::fprintf(stderr, "error: %s\n", e.what());
+        return static_cast<int>(e.exitCode());
+    }
 }

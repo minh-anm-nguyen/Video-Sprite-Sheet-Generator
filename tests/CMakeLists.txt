@@ -1,8 +1,11 @@
 find_package(Catch2 3 REQUIRED)
 
 add_executable(vss_tests
+    test_app_config.cpp
+    test_cli_parser.cpp
     test_core_types.cpp
     test_grid_layout.cpp
+    test_image_format.cpp
     test_timestamp_planner.cpp
 )
 target_link_libraries(vss_tests PRIVATE vss_core Catch2::Catch2WithMain)

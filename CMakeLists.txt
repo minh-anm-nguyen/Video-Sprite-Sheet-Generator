@@ -15,9 +15,12 @@ endif()
 find_package(FFMPEG REQUIRED)
 
 add_library(vss_core STATIC
+    src/cli/CliParser.cpp
+    src/core/AppConfig.cpp
     src/core/AppError.cpp
     src/core/GridLayout.cpp
     src/core/TimestampPlanner.cpp
+    src/media/ImageFormat.cpp
 )
 target_include_directories(vss_core PUBLIC src)
 
@@ -31,7 +34,6 @@ target_link_libraries(vss_media PUBLIC vss_core ${FFMPEG_LIBRARIES})
 add_executable(video-sprite-sheet
     src/main.cpp
 )
-target_include_directories(video-sprite-sheet SYSTEM PRIVATE ${FFMPEG_INCLUDE_DIRS})
 target_link_libraries(video-sprite-sheet PRIVATE vss_media)
 
 include(CTest)
