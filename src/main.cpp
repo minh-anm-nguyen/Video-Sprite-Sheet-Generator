@@ -16,10 +16,10 @@ void printVersion(const char* name, unsigned version) {
                 AV_VERSION_MICRO(version));
 }
 
-} // namespace
+}
 
 int main() {
-    std::printf("video-sprite-sheet — toolchain check (Giai đoạn 0)\n");
+    std::printf("video-sprite-sheet\n");
     printVersion("libavformat", avformat_version());
     printVersion("libavcodec", avcodec_version());
     printVersion("libavutil", avutil_version());

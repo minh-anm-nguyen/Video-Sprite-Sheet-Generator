@@ -12,7 +12,8 @@ add_executable(video-sprite-sheet
     src/main.cpp
 )
 
-target_include_directories(video-sprite-sheet PRIVATE src ${FFMPEG_INCLUDE_DIRS})
+target_include_directories(video-sprite-sheet PRIVATE src)
+target_include_directories(video-sprite-sheet SYSTEM PRIVATE ${FFMPEG_INCLUDE_DIRS})
 target_link_directories(video-sprite-sheet PRIVATE ${FFMPEG_LIBRARY_DIRS})
 target_link_libraries(video-sprite-sheet PRIVATE ${FFMPEG_LIBRARIES})
 
