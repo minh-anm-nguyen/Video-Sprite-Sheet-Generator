@@ -28,6 +28,7 @@ add_library(vss_core STATIC
 target_include_directories(vss_core PUBLIC src)
 
 add_library(vss_media STATIC
+    src/app/Application.cpp
     src/media/Frame.cpp
     src/media/FrameScaler.cpp
     src/media/ImageEncoder.cpp
@@ -41,6 +42,7 @@ target_link_libraries(vss_media PUBLIC vss_core ${FFMPEG_LIBRARIES})
 add_executable(video-sprite-sheet
     src/main.cpp
 )
+target_include_directories(video-sprite-sheet SYSTEM PRIVATE ${FFMPEG_INCLUDE_DIRS})
 target_link_libraries(video-sprite-sheet PRIVATE vss_media)
 
 include(CTest)

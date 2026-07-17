@@ -2,6 +2,7 @@ find_package(Catch2 3 REQUIRED)
 
 add_executable(vss_tests
     test_app_config.cpp
+    test_application.cpp
     test_atomic_file_writer.cpp
     test_cli_parser.cpp
     test_core_types.cpp
