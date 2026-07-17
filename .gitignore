@@ -7,3 +7,4 @@ CMakeUserPresets.json
 tests/assets/*.mp4
 tests/assets/*.mkv
 tests/assets/*.bin
+tests/assets/out/
