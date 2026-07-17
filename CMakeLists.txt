@@ -21,6 +21,8 @@ add_library(vss_core STATIC
     src/core/GridLayout.cpp
     src/core/TimestampPlanner.cpp
     src/media/ImageFormat.cpp
+    src/output/VttCueBuilder.cpp
+    src/output/WebVttWriter.cpp
 )
 target_include_directories(vss_core PUBLIC src)
 

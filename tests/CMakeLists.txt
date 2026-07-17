@@ -7,7 +7,9 @@ add_executable(vss_tests
     test_grid_layout.cpp
     test_image_format.cpp
     test_timestamp_planner.cpp
+    test_vtt.cpp
 )
+target_include_directories(vss_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(vss_tests PRIVATE vss_core Catch2::Catch2WithMain)
 
 include(Catch)
