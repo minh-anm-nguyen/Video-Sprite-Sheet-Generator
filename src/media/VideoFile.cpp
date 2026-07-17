@@ -1,11 +1,13 @@
 #include "media/VideoFile.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <memory>
 #include <string>
 #include <system_error>
+#include <thread>
 #include <utility>
 
 extern "C" {
@@ -150,8 +152,13 @@ VideoInfo VideoFile::open(const std::filesystem::path& path) {
     AVStream* stream = formatCtx_->streams[streamIndex_];
     codecCtx_ = avcodec_alloc_context3(decoder);
     if (codecCtx_ == nullptr ||
-        avcodec_parameters_to_context(codecCtx_, stream->codecpar) < 0 ||
-        avcodec_open2(codecCtx_, decoder, nullptr) < 0) {
+        avcodec_parameters_to_context(codecCtx_, stream->codecpar) < 0) {
+        close();
+        failInput("cannot open video decoder: " + path.string());
+    }
+    codecCtx_->thread_count = static_cast<int>(
+        std::clamp(std::thread::hardware_concurrency(), 1u, 4u));
+    if (avcodec_open2(codecCtx_, decoder, nullptr) < 0) {
         close();
         failInput("cannot open video decoder: " + path.string());
     }
