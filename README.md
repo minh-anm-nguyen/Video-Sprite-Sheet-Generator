@@ -18,7 +18,9 @@ sprite.jpg#xywh=0,0,160,90
 sprite.jpg#xywh=160,0,160,90
 ```
 
-Any player with thumbnail track support (Video.js, Plyr, JW Player, ...) consumes these two files as-is.
+Any player with thumbnail track support (Video.js, Plyr, JW Player, ...) consumes these two files as-is. Hovering the seek bar looks up the cue for the time under the cursor and crops the matching tile straight from the sprite:
+
+![Hover preview over the seek bar](assets/demo_hover.png)
 
 ## Features
 
