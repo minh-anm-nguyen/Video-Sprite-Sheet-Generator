@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "cli/ProgressReporter.h"
 #include "core/GridLayout.h"
 #include "core/Rect.h"
 #include "core/TimestampPlanner.h"
@@ -23,9 +24,18 @@
 
 namespace vss {
 
+namespace {
+
+struct CancelledError {};
+
+}
+
 Application::Application(AppConfig config, IVideoSource& videoSource,
-                         IFileWriter& fileWriter)
-    : config_(std::move(config)), videoSource_(videoSource), fileWriter_(fileWriter) {}
+                         IFileWriter& fileWriter, const CancellationToken* cancellation)
+    : config_(std::move(config)),
+      videoSource_(videoSource),
+      fileWriter_(fileWriter),
+      cancellation_(cancellation) {}
 
 ExitCode Application::run() {
     try {
@@ -54,7 +64,9 @@ ExitCode Application::run() {
         }
         FrameScaler scaler(layout.cellWidth(), layout.cellHeight());
         ImageEncoder encoder(*format, config_.jpegQuality);
+        ProgressReporter progress(n, config_.quiet);
         int decodedCount = 0;
+        int processed = 0;
 
         for (int s = 0; s < sheetCount; ++s) {
             int begin = s * capacity;
@@ -62,22 +74,27 @@ ExitCode Application::run() {
             GridLayout sheetLayout = layout.fitToContent(count);
             SpriteSheet sheet(sheetLayout, s);
             for (int i = 0; i < count; ++i) {
+                if (cancellation_ != nullptr && cancellation_->isCancelled()) {
+                    throw CancelledError{};
+                }
                 double t = timestamps[begin + i];
                 Rect cell = sheetLayout.cellRect(i);
-                if (!videoSource_.seekTo(t)) {
+                if (videoSource_.seekTo(t)) {
+                    std::optional<Frame> frame = videoSource_.decodeFrameAtOrAfter(t);
+                    if (frame.has_value()) {
+                        sheet.place(scaler.normalize(*frame, info.rotationDegrees), cell);
+                        ++decodedCount;
+                    } else {
+                        sheet.fillBlack(cell);
+                    }
+                } else {
                     sheet.fillBlack(cell);
-                    continue;
                 }
-                std::optional<Frame> frame = videoSource_.decodeFrameAtOrAfter(t);
-                if (!frame.has_value()) {
-                    sheet.fillBlack(cell);
-                    continue;
-                }
-                sheet.place(scaler.normalize(*frame, info.rotationDegrees), cell);
-                ++decodedCount;
+                progress.update(++processed);
             }
             fileWriter_.write(config_.sheetPath(s, sheetCount), encoder.encode(sheet));
         }
+        progress.finish();
 
         if (decodedCount == 0) {
             fileWriter_.removeAllCreated();
@@ -89,6 +106,10 @@ ExitCode Application::run() {
         WebVttWriter(fileWriter_).write(builder.buildCues(n, interval, info.duration),
                                         config_.vttPath);
         return ExitCode::Success;
+    } catch (const CancelledError&) {
+        fileWriter_.removeAllCreated();
+        std::fprintf(stderr, "error: interrupted, all output files were removed\n");
+        return ExitCode::Interrupted;
     } catch (const AppError& e) {
         reportError(e);
         return e.exitCode();

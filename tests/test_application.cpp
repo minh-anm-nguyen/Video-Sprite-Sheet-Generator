@@ -132,6 +132,52 @@ TEST_CASE("an unopenable input fails with the input exit code") {
     CHECK(writer.files().empty());
 }
 
+TEST_CASE("a cancellation before the first mark stops the run cleanly") {
+    FakeVideoSource source;
+    MemoryFileWriter writer;
+    CancellationToken token;
+    token.requestCancel();
+    Application app(makeConfig(), source, writer, &token);
+
+    CHECK(app.run() == ExitCode::Interrupted);
+    CHECK(writer.files().empty());
+    CHECK(source.decodeCalls == 0);
+}
+
+namespace {
+
+class CancellingSource : public FakeVideoSource {
+public:
+    CancellationToken* token = nullptr;
+    int cancelAtCall = 0;
+
+    std::optional<Frame> decodeFrameAtOrAfter(double t) override {
+        if (token != nullptr && decodeCalls + 1 >= cancelAtCall) {
+            token->requestCancel();
+        }
+        return FakeVideoSource::decodeFrameAtOrAfter(t);
+    }
+};
+
+}
+
+TEST_CASE("a cancellation midway removes every file already written") {
+    AppConfig config = makeConfig();
+    config.intervalSec = 2.0;
+    CancellingSource source;
+    source.info.duration = 124.0;
+    MemoryFileWriter writer;
+    CancellationToken token;
+    source.token = &token;
+    source.cancelAtCall = 30;
+    Application app(config, source, writer, &token);
+
+    CHECK(app.run() == ExitCode::Interrupted);
+    CHECK(writer.files().empty());
+    CHECK(source.decodeCalls >= 30);
+    CHECK(source.decodeCalls < 62);
+}
+
 TEST_CASE("seek failures turn into black cells instead of aborting") {
     FakeVideoSource source;
     source.failSeek = true;

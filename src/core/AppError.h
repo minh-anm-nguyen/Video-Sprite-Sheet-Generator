@@ -9,7 +9,8 @@ enum class ExitCode {
     Success = 0,
     ArgumentError = 1,
     InputError = 2,
-    ProcessingError = 3
+    ProcessingError = 3,
+    Interrupted = 4
 };
 
 enum class ErrorCategory {

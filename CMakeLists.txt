@@ -16,6 +16,7 @@ find_package(FFMPEG REQUIRED)
 
 add_library(vss_core STATIC
     src/cli/CliParser.cpp
+    src/cli/ProgressReporter.cpp
     src/core/AppConfig.cpp
     src/core/AppError.cpp
     src/core/GridLayout.cpp
@@ -24,6 +25,7 @@ add_library(vss_core STATIC
     src/output/AtomicFileWriter.cpp
     src/output/VttCueBuilder.cpp
     src/output/WebVttWriter.cpp
+    src/platform/Platform.cpp
 )
 target_include_directories(vss_core PUBLIC src)
 

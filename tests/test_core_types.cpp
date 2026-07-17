@@ -26,6 +26,7 @@ TEST_CASE("ExitCode values match the CLI contract") {
     CHECK(static_cast<int>(ExitCode::ArgumentError) == 1);
     CHECK(static_cast<int>(ExitCode::InputError) == 2);
     CHECK(static_cast<int>(ExitCode::ProcessingError) == 3);
+    CHECK(static_cast<int>(ExitCode::Interrupted) == 4);
 }
 
 TEST_CASE("Rect supports value equality") {

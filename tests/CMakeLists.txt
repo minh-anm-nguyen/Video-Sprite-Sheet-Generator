@@ -9,6 +9,7 @@ add_executable(vss_tests
     test_grid_layout.cpp
     test_image_format.cpp
     test_pixel_pipeline.cpp
+    test_progress_reporter.cpp
     test_timestamp_planner.cpp
     test_video_file.cpp
     test_vtt.cpp

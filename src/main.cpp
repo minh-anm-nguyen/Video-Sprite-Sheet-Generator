@@ -8,11 +8,15 @@ extern "C" {
 #include "cli/CliParser.h"
 #include "core/AppConfig.h"
 #include "core/AppError.h"
+#include "core/CancellationToken.h"
 #include "media/VideoFile.h"
 #include "output/AtomicFileWriter.h"
+#include "platform/Platform.h"
 
 int main(int argc, char** argv) {
     av_log_set_level(AV_LOG_ERROR);
+    vss::CancellationToken cancellation;
+    vss::platform::installCancellationHandler(cancellation);
     std::optional<vss::AppConfig> config;
     try {
         config = vss::CliParser::parse(argc, argv);
@@ -26,6 +30,6 @@ int main(int argc, char** argv) {
 
     vss::VideoFile videoSource;
     vss::AtomicFileWriter fileWriter(config->force);
-    vss::Application app(*config, videoSource, fileWriter);
+    vss::Application app(*config, videoSource, fileWriter, &cancellation);
     return static_cast<int>(app.run());
 }
