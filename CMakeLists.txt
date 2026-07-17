@@ -16,6 +16,8 @@ find_package(FFMPEG REQUIRED)
 
 add_library(vss_core STATIC
     src/core/AppError.cpp
+    src/core/GridLayout.cpp
+    src/core/TimestampPlanner.cpp
 )
 target_include_directories(vss_core PUBLIC src)
 
