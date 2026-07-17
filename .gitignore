@@ -1,0 +1,14 @@
+# Build output
+build/
+out/
+vcpkg_installed/
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+CMakeUserPresets.json
+
+# Test assets sinh bằng script (file video lớn, không commit)
+tests/assets/*.mp4
+tests/assets/*.mkv
+tests/assets/*.bin

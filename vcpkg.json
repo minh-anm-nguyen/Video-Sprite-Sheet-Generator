@@ -1,0 +1,17 @@
+{
+  "name": "video-sprite-sheet",
+  "version": "0.1.0",
+  "dependencies": [
+    {
+      "name": "ffmpeg",
+      "default-features": false,
+      "features": [
+        "avcodec",
+        "avformat",
+        "swscale",
+        "zlib"
+      ]
+    }
+  ],
+  "builtin-baseline": "908da3a305a0a8028d9602ab241b433652b3df69"
+}
