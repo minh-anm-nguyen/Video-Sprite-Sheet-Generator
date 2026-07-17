@@ -29,6 +29,7 @@ target_include_directories(vss_core PUBLIC src)
 
 add_library(vss_media STATIC
     src/media/Frame.cpp
+    src/media/VideoFile.cpp
 )
 target_include_directories(vss_media SYSTEM PRIVATE ${FFMPEG_INCLUDE_DIRS})
 target_link_directories(vss_media PUBLIC ${FFMPEG_LIBRARY_DIRS})

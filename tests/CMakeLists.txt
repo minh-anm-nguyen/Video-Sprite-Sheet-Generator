@@ -8,10 +8,13 @@ add_executable(vss_tests
     test_grid_layout.cpp
     test_image_format.cpp
     test_timestamp_planner.cpp
+    test_video_file.cpp
     test_vtt.cpp
 )
 target_include_directories(vss_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(vss_tests PRIVATE vss_core Catch2::Catch2WithMain)
+target_compile_definitions(vss_tests PRIVATE
+    VSS_TEST_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
+target_link_libraries(vss_tests PRIVATE vss_core vss_media Catch2::Catch2WithMain)
 
 include(Catch)
 catch_discover_tests(vss_tests)
